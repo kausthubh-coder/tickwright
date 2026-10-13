@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tickwright design: exploiting the world's rules is the progression</title>
+<style>
+/* Tokens. Neutrals do the work; the accent marks links and the current thing;
+   green, amber and red appear only when they mean pass, warning or failure. */
+:root {
+  color-scheme: light dark;
+  --bg: #fcfcfb;      --surface: #f2f2f0;   --line: #dcdcd8;
+  --text: #1b1b1a;    --text-2: #4a4a47;    --text-3: #67675f;
+  --accent: #2a5db0;  --accent-bg: #e8eefa;
+  --ok: #23703a;      --ok-bg: #e6f2e9;
+  --warn: #8a5a00;    --warn-bg: #fbf0d9;
+  --bad: #b3261e;     --bad-bg: #fbe7e5;
+  --code-bg: #f2f2f0;
+
+  /* Type scale (~1.25): caption, body, subhead, title, display. Use nothing else. */
+  --fs-caption: 0.875rem; --fs-body: 1.0625rem; --fs-sub: 1.3125rem; --fs-title: 1.625rem; --fs-display: 2.0625rem;
+  /* Spacing scale. Gaps inside a group are about half the gaps between groups. */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+
+  --measure: 39rem;   /* prose line length: ~70 characters at body size */
+  --wide: 1080px;     /* tables, diagrams, comparisons */
+  --radius: 8px;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161616;      --surface: #212120;   --line: #353533;
+    --text: #ececea;    --text-2: #bcbcb6;    --text-3: #9b9b94;
+    --accent: #8fb3f5;  --accent-bg: #1d2a42;
+    --ok: #7fcf94;      --ok-bg: #18301f;
+    --warn: #e6b85c;    --warn-bg: #352a12;
+    --bad: #f2928b;     --bad-bg: #3b1d1a;
+    --code-bg: #212120;
+  }
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; padding: var(--s7) var(--s5) var(--s8);
+  font: 400 var(--fs-body)/1.6 var(--sans); color: var(--text);
+}
+main > * { max-width: var(--measure); margin-inline: auto; }
+main > .wide { max-width: var(--wide); }
+
+h1, h2, h3 { line-height: 1.25; text-wrap: balance; margin-block: 0; }
+h1 { font-size: var(--fs-display); font-weight: 650; letter-spacing: -0.02em; }
+h2 { font-size: var(--fs-title); font-weight: 650; letter-spacing: -0.015em; margin-top: var(--s8); }
+h3 { font-size: var(--fs-sub); font-weight: 600; letter-spacing: -0.01em; margin-top: var(--s6); }
+h2 + *, h3 + * { margin-top: var(--s3); }
+p, ul, ol, table, pre, figure, details, .callout, .steps, .flow { margin-block: var(--s4) 0; }
+p { text-wrap: pretty; }
+li + li { margin-top: var(--s2); }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+strong { font-weight: 600; }
+.muted { color: var(--text-3); }
+small, .caption { font-size: var(--fs-caption); color: var(--text-3); }
+.num { font-variant-numeric: tabular-nums; }
+hr { border: 0; border-top: 1px solid var(--line); margin-block: var(--s7); }
+
+/* Header: what this is, then the answer as the h1, then the short version. */
+.meta { font-size: var(--fs-caption); color: var(--text-3); display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); align-items: center; margin-bottom: var(--s3); }
+.lede { font-size: var(--fs-sub); line-height: 1.5; color: var(--text-2); margin-top: var(--s4); }
+.tldr { background: var(--surface); border-radius: var(--radius); padding: var(--s5); margin-top: var(--s6); }
+.tldr > :first-child { margin-top: 0; }
+.tldr ul { padding-left: 1.2em; }
+
+/* Table of contents, for pages with more than ~4 sections. */
+nav.toc { font-size: var(--fs-caption); margin-top: var(--s6); }
+nav.toc ol { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); list-style: none; padding: 0; margin: 0; }
+nav.toc li + li { margin-top: 0; }
+
+/* Status: always a word, colour only reinforces it. */
+.tag { display: inline-block; font-size: var(--fs-caption); font-weight: 600; line-height: 1; padding: 5px 8px; border-radius: 999px; background: var(--surface); color: var(--text-2); white-space: nowrap; }
+.tag.ok { background: var(--ok-bg); color: var(--ok); }
+.tag.warn { background: var(--warn-bg); color: var(--warn); }
+.tag.bad { background: var(--bad-bg); color: var(--bad); }
+.tag.info { background: var(--accent-bg); color: var(--accent); }
+
+/* Callouts: one job each. Use sparingly; if everything is a callout nothing is. */
+.callout { border-left: 3px solid var(--line); padding: var(--s1) 0 var(--s1) var(--s4); }
+.callout > :first-child { margin-top: 0; }
+.callout.ask { border-color: var(--accent); }   /* what I need from the reader */
+.callout.risk { border-color: var(--warn); }
+.callout.bad { border-color: var(--bad); }
+.label { display: block; font-size: var(--fs-caption); font-weight: 600; color: var(--text-2); margin-bottom: var(--s1); }
+
+/* Numbered steps for a sequence the reader follows. */
+.steps { list-style: none; padding: 0; counter-reset: step; }
+.steps > li { counter-increment: step; position: relative; padding-left: 2.5em; }
+.steps > li + li { margin-top: var(--s4); }
+.steps > li::before { content: counter(step); position: absolute; left: 0; top: 0.1em; width: 1.7em; height: 1.7em; border-radius: 50%; background: var(--surface); color: var(--text-2); font-size: var(--fs-caption); font-weight: 600; display: grid; place-items: center; }
+
+/* Flow: boxes and arrows in plain HTML. Wraps to a column on narrow screens. */
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: var(--s2); }
+.flow .node { flex: 1 1 140px; background: var(--surface); border-radius: var(--radius); padding: var(--s3) var(--s4); }
+.flow .node b { display: block; font-weight: 600; }
+.flow .node span { font-size: var(--fs-caption); color: var(--text-3); }
+.flow .node.hl { background: var(--accent-bg); }
+.flow .arrow { align-self: center; color: var(--text-3); }
+@media (max-width: 560px) { .flow { flex-direction: column; } .flow .node { flex: none; } .flow .arrow { transform: rotate(90deg); } }
+
+/* Tables: header row, left-aligned text, right-aligned numbers, scroll when narrow. */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: var(--fs-caption); line-height: 1.5; }
+th, td { text-align: left; vertical-align: top; padding: var(--s2) var(--s3); border-bottom: 1px solid var(--line); }
+th { font-weight: 600; color: var(--text-2); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+tr.pick td { background: var(--accent-bg); }
+
+/* Code and paths. */
+code { font-family: var(--mono); font-size: 0.9em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); border-radius: var(--radius); padding: var(--s4); overflow-x: auto; font-size: var(--fs-caption); line-height: 1.55; }
+pre code { background: none; padding: 0; overflow-wrap: normal; }
+figcaption { font-size: var(--fs-caption); color: var(--text-3); margin-top: var(--s2); }
+
+/* Depth on demand. The summary line must say what is inside. */
+details { border-top: 1px solid var(--line); padding-top: var(--s3); }
+details + details { margin-top: 0; }
+details > :not(summary) { margin-top: var(--s3); }
+details:last-of-type { border-bottom: 1px solid var(--line); padding-bottom: var(--s3); }
+summary { cursor: pointer; font-weight: 600; }
+summary small { font-weight: 400; margin-left: var(--s2); }
+
+/* Questions for the reader. */
+ol.questions { padding-left: 1.4em; }
+ol.questions li + li { margin-top: var(--s3); }
+
+/* Scrolling wrapper so the farm diagram keeps readable text on phones. */
+.scroll-x { overflow-x: auto; }
+.scroll-x svg { min-width: 600px; }
+
+/* Palette swatches: the game's colors are content here, not page styling. */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: var(--s2); margin-top: var(--s4); }
+.swatch { font-size: var(--fs-caption); line-height: 1.35; }
+.swatch i { display: block; height: 40px; border-radius: 6px; margin-bottom: var(--s1); box-shadow: inset 0 0 0 1px rgba(127,127,127,.25); }
+.swatch code { background: none; padding: 0; color: var(--text-3); }
+
+footer { margin-top: var(--s8); font-size: var(--fs-caption); color: var(--text-3); }
+footer > * { max-width: var(--measure); margin-inline: auto; }
+
+@media (max-width: 560px) { body { padding: var(--s6) var(--s4) var(--s7); } h2 { margin-top: var(--s7); } }
+@media print {
+  :root { color-scheme: light; }
+  body { padding: 0; } nav.toc { display: none; }
+  details { border: 0; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; color: var(--text-3); }
+  h2, h3 { break-after: avoid; } figure, table, .flow { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="meta"><span>Tickwright (working title)</span><span>Design doc, phase 1</span><span>13 Oct 2026</span><span class="tag warn">Needs your answers</span></div>
+  <h1>Tickwright: a co&#8209;op anime sky&#8209;island game where exploiting the world's rules on purpose is how you progress</h1>
+  <p class="lede">Technical Minecraft players build farms by abusing spawn rules, item physics and redstone timing. Tickwright makes that the whole game. Every rule is short, visible in the world and deterministic. The story gives the farms something to feed, and fast combat tests what they produce.</p>
+</header>
+
+<section class="tldr" aria-label="Summary">
+  <ul>
+    <li><strong>Core loop.</strong> Meet a mob, read its rules with Sight (an in-world debug view), build a farm that exploits them, spend the output, then meet a mob whose rules break your last design.</li>
+    <li><strong>Four exploitable systems.</strong> Darkness spawning under a mob cap, items as physical objects, Blink Pearls that keep momentum, and Ley, a redstone-like logic.</li>
+    <li><strong>Multiplayer.</strong> Co-op worlds of 1 to 8 players, each run by one authoritative server (a Cloudflare Durable Object) using the same simulation code as the browser. The client is Vite and Three.js on Vercel, with Clerk sign-in.</li>
+    <li><strong>First playable slice.</strong> One sky island, building, farmable Gloomlings, item drops, and two or more players in one world at 60 fps on a mid laptop.</li>
+    <li><strong>Main risk.</strong> A high 2.5D camera can't see into the dark roofed rooms that farms need, so the slice ships a cutaway view.</li>
+  </ul>
+</section>
+
+<div class="callout ask"><span class="label">What I need from you</span>
+<p>Answer by number; a letter each is enough. I'll build the slice after you reply. Each default is what I'll do if you don't mind either way.</p>
+<ol class="questions">
+  <li><strong>"Fast spcae mechin."</strong> What did you mean? (a) Fast-paced combat and movement: dash, parry, teleport-blink. <em>Default.</em> (b) Pilotable mechs that players build from blocks. (c) Fast ships or flight between islands.</li>
+  <li><strong>World shape.</strong> (a) Finite sky islands over a void. <em>Default:</em> memory stays bounded, it fits the story, and "build the farm over the void" becomes a real technique. (b) Endless Minecraft-style terrain.</li>
+  <li><strong>Players per world.</strong> (a) Private co-op worlds of 1 to 8, joined by invite link. <em>Default.</em> (b) Large shared worlds of 20 to 100 players. Option (b) needs a different server design, so it matters now.</li>
+  <li><strong>Farms while everyone is offline.</strong> (a) The world pauses when the last player leaves. <em>Default:</em> costs nothing. (b) Worlds keep running 24/7, about $4.13 per world per month on Cloudflare's paid plan. (c) Pause, then estimate the output when someone returns.</li>
+  <li><strong>Character proportions.</strong> (a) Chibi, about 2.5 heads tall. <em>Default:</em> reads well from a high camera. (b) Taller anime proportions, about 6 heads.</li>
+</ol>
+<p>Unless you object, I'll also use Cloudflare Durable Objects with PartyServer for the game server, leave out PvP, write plain TypeScript without React, and use no image textures or 2D art.</p>
+</div>
+
+<nav class="toc" aria-label="Contents"><ol>
+  <li><a href="#loop">Loop</a></li><li><a href="#rules">Rules</a></li><li><a href="#progression">Progression</a></li><li><a href="#story">Story</a></li><li><a href="#combat">Combat</a></li><li><a href="#art">Art</a></li><li><a href="#multiplayer">Multiplayer</a></li><li><a href="#principles">Principles</a></li><li><a href="#tech">Tech plan</a></li><li><a href="#slice">Slice</a></li><li><a href="#risks">Risks</a></li>
+</ol></nav>
+
+<h2 id="loop">Farms make the power, combat spends it, and each new mob forces a new farm</h2>
+
+<div class="flow wide" role="img" aria-label="Meet a mob, read its rules, build a farm, harvest, spend, unlock the next mob, and repeat">
+  <div class="node"><b>Meet a mob</b><span>new island, new rule</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>Read it</b><span>Sight shows light, spawn checks, cap</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node hl"><b>Build a farm</b><span>exploit the rule with blocks and Ley</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>Harvest</b><span>runs while you fight and explore</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>Spend</b><span>gear, Ley parts, Law Shards</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>Unlock</b><span>the next island and its mob</span></div>
+</div>
+
+<p>In a typical session, your crew's farms have been filling chests while anyone was online. You spend the output on gear and parts, then go fight on a new island, where a mob behaves in a way your current farms can't handle. You come back with a new part and an idea, and rebuild. Farms are the progression and combat is the test. Kills are a small source of loot and give no XP.</p>
+
+<h2 id="rules">The rules are the content: short, visible, deterministic, and meant to be exploited</h2>
+
+<p>Every system follows three constraints. Each rule fits in one sentence. <strong>Sight</strong>, an ability every player has, draws the rules in the world: light numbers on blocks, a mark on each cell saying whether a mob could spawn there and, if not, why, the mob cap, and the signal on every wire. And the simulation is <strong>deterministic</strong>. It ticks 20 times a second in a fixed, documented order, and its randomness comes from a generator seeded per chunk and tick, so the same build gives the same result every time.</p>
+<p>Exploits come from combining rules, so there are no special cases. A current that pushes items also pushes mobs, players and pearls.</p>
+
+<details><summary>Tick order <small>six phases, printed in the in-game Codex</small></summary>
+<div class="flow" role="img" aria-label="Each tick runs in this order: player inputs, scheduled block ticks, Ley settles, entities move oldest first, spawning, items merge and get picked up">
+  <div class="node"><b>1. Inputs</b><span>moves, place, break</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>2. Block ticks</b><span>repeaters, pistons, first in first out</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>3. Ley settles</b><span>signals spread in the same tick</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>4. Entities</b><span>move and think, oldest first</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>5. Spawning</b><span>one attempt per chunk</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>6. Items</b><span>merge, collect, pick up</span></div>
+</div>
+<p class="caption">One tick is 50 ms. Minecraft's technical players work this order out from decompiled code; here the game tells them.</p>
+</details>
+
+<h3>Spawning: dark cells with headroom, far from players, under the cap</h3>
+<p>Each tick, every loaded chunk picks one random column and a random height up to that column's top block. A Gloomling appears there if the block below is solid, the two above are air, the light is 0, no player is within 24 blocks, some player is within 128, and the world is under its mob cap.</p>
+
+<figure>
+<div class="scroll-x">
+<svg viewBox="0 0 660 400" role="img" aria-labelledby="farm-title" style="width:100%;height:auto">
+  <title id="farm-title">Side view of a Gloomling farm: two dark floors under a roof, built over the void, with a drop shaft down to a collector. The player waits on the island more than 24 blocks away.</title>
+  <defs>
+    <marker id="farm-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#7cf2ff"/></marker>
+    <marker id="farm-arrow-dim" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8" fill="var(--text-3)"/></marker>
+  </defs>
+  <g font-family="inherit" font-size="13" fill="currentColor">
+    <!-- island -->
+    <path d="M10,330 L230,330 L215,352 L170,372 L90,378 L40,360 Z" fill="var(--surface)" stroke="var(--line)"/>
+    <rect x="10" y="326" width="220" height="6" fill="#7ccf6b"/>
+    <!-- player -->
+    <circle cx="120" cy="303" r="8" fill="#ffe0c7" stroke="#2a2238" stroke-width="1.5"/>
+    <rect x="113" y="311" width="14" height="15" rx="3" fill="#6c8cff" stroke="#2a2238" stroke-width="1.5"/>
+    <text x="120" y="280" text-anchor="middle" font-weight="600">You wait here</text>
+    <text x="120" y="396" text-anchor="middle" font-size="12" fill="var(--text-3)">island</text>
+    <!-- distance line -->
+    <line x1="140" y1="300" x2="372" y2="135" stroke="var(--text-3)" stroke-dasharray="4 4" marker-end="url(#farm-arrow-dim)"/>
+    <text x="214" y="196" text-anchor="middle" font-size="12" fill="var(--text-3)" transform="rotate(-35 214 196)">24 to 128 blocks away</text>
+    <!-- farm room -->
+    <rect x="388" y="50" width="204" height="76" fill="#2b2550"/>
+    <rect x="380" y="40" width="220" height="10" fill="var(--text-3)"/>
+    <rect x="380" y="40" width="8" height="86" fill="var(--text-3)"/>
+    <rect x="592" y="40" width="8" height="86" fill="var(--text-3)"/>
+    <rect x="388" y="82" width="82" height="7" fill="var(--text-3)"/><rect x="510" y="82" width="82" height="7" fill="var(--text-3)"/>
+    <rect x="388" y="119" width="82" height="7" fill="var(--text-3)"/><rect x="510" y="119" width="82" height="7" fill="var(--text-3)"/>
+    <text x="490" y="30" text-anchor="middle" font-weight="600">Roof and walls: light 0 inside</text>
+    <!-- gloomlings -->
+    <g fill="#4a3f8c" stroke="#7cf2ff" stroke-width="1">
+      <ellipse cx="415" cy="75" rx="8" ry="6"/><ellipse cx="447" cy="75" rx="8" ry="6"/>
+      <ellipse cx="540" cy="112" rx="8" ry="6"/><ellipse cx="568" cy="112" rx="8" ry="6"/>
+    </g>
+    <g fill="#7cf2ff"><circle cx="413" cy="74" r="1.4"/><circle cx="418" cy="74" r="1.4"/><circle cx="445" cy="74" r="1.4"/><circle cx="450" cy="74" r="1.4"/><circle cx="538" cy="111" r="1.4"/><circle cx="543" cy="111" r="1.4"/><circle cx="566" cy="111" r="1.4"/><circle cx="571" cy="111" r="1.4"/></g>
+    <line x1="456" y1="72" x2="476" y2="72" stroke="#7cf2ff" stroke-width="1.5" marker-end="url(#farm-arrow)"/>
+    <line x1="530" y1="109" x2="512" y2="109" stroke="#7cf2ff" stroke-width="1.5" marker-end="url(#farm-arrow)"/>
+    <!-- shaft -->
+    <rect x="466" y="126" width="4" height="204" fill="var(--line)"/><rect x="510" y="126" width="4" height="204" fill="var(--line)"/>
+    <ellipse cx="490" cy="190" rx="8" ry="6" fill="#4a3f8c" stroke="#7cf2ff"/>
+    <line x1="490" y1="200" x2="490" y2="240" stroke="#7cf2ff" stroke-width="1.5" marker-end="url(#farm-arrow)"/>
+    <text x="522" y="170" font-weight="600">24-block drop</text>
+    <text x="522" y="188" font-size="12" fill="var(--text-3)">1 damage per block</text>
+    <text x="522" y="204" font-size="12" fill="var(--text-3)">after the first 3</text><text x="522" y="220" font-size="12" fill="var(--text-3)">kills an 8 HP mob</text>
+    <!-- items + collector -->
+    <g fill="#b69cff"><path d="M484,310 l5,-6 l5,6 l-5,6 z"/><path d="M492,296 l4,-5 l4,5 l-4,5 z"/></g>
+    <rect x="474" y="330" width="32" height="20" rx="3" fill="var(--accent-bg)" stroke="var(--accent)"/>
+    <rect x="510" y="330" width="30" height="20" rx="3" fill="var(--surface)" stroke="var(--line)"/>
+    <rect x="440" y="350" width="120" height="7" fill="var(--text-3)"/>
+    <text x="490" y="378" text-anchor="middle" font-weight="600">Collector into chest</text>
+    <text x="490" y="395" text-anchor="middle" font-size="12" fill="var(--text-3)">2.5 items/s per collector</text>
+    <!-- void label -->
+    <text x="456" y="250" text-anchor="end" font-size="12" fill="var(--text-3)">Over the void:</text>
+    <text x="456" y="266" text-anchor="end" font-size="12" fill="var(--text-3)">no other ground</text>
+    <text x="456" y="282" text-anchor="end" font-size="12" fill="var(--text-3)">in these columns</text>
+  </g>
+</svg>
+</div>
+<figcaption>The first farm players build. Every spawn attempt in these columns lands on a dark floor, Gloomlings hop off the edge, and the fall kills them.</figcaption>
+</figure>
+
+<p><strong>The exploits players will find:</strong> light every cave so only the farm fills the mob cap. Build over the void so no other ground shares the farm's columns. Stand 24 to 128 blocks away so spawns happen and the chunks keep running.</p>
+
+<details><summary>Spawn, light and Gloomling numbers <small>exact values the Codex will show</small></summary>
+<div class="table-wrap"><table>
+  <thead><tr><th>Rule</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Attempts</td><td>1 per loaded chunk per tick; the height is random from 0 to one above the column's top block</td></tr>
+    <tr><td>Surface</td><td>Solid opaque full block. Glass, slabs, lamps and Ley parts don't count.</td></tr>
+    <tr><td>Headroom</td><td>2 air blocks</td></tr>
+    <tr><td>Light</td><td>0, where light is the higher of block light and sky light</td></tr>
+    <tr><td>Block light</td><td>Lanterns and lit lamps give 15, minus 1 per block, stopped by opaque blocks</td></tr>
+    <tr><td>Sky light</td><td>15 under open sky, spreading sideways minus 1 per block, so a roof near an open edge still needs walls</td></tr>
+    <tr><td>Packs</td><td>After a success, 3 more tries within 4 blocks</td></tr>
+    <tr><td>Player distance</td><td>No player within 24 blocks; at least one within 128</td></tr>
+    <tr><td>Mob cap</td><td>30 hostile mobs per online player, counted across the world</td></tr>
+    <tr><td>Despawn</td><td>Over 64 blocks from every player: 1 in 800 chance per tick. Over 128: removed at once. Named mobs stay.</td></tr>
+    <tr><td>Gloomling</td><td>8 HP. Hops every 2 to 4 s in a random direction, chases players within 12 blocks, never checks for edges. Takes 1 damage per block fallen past 3, and 1 per second in light 12 or more.</td></tr>
+    <tr><td>Drops</td><td>1 to 2 Gloom Essence; Shade Silk 1 time in 8</td></tr>
+  </tbody>
+</table></div>
+</details>
+
+<h3>Items: real objects that fall, merge, get pushed and expire</h3>
+<p>A dropped item is an entity with the same physics as everything else. Matching items within half a block merge into one stack, a player picks them up within 1.5 blocks, and they vanish after 5 minutes.</p>
+<p><strong>The exploits players will find:</strong> a collector moves only 2.5 items per second, so a fast farm needs parallel collector lines. Currents carry items to a central sorter. A pressure plate fires for any entity, items included, so a farm can count its own output.</p>
+<details><summary>Item physics numbers</summary>
+<p>Gravity 0.04 blocks per tick squared, air drag 2% per tick, ground friction 40% per tick. Merge check every 10 ticks, up to 64 per stack. Pickup delay 10 ticks after dropping. Lifetime 6,000 ticks. A collector pulls from the cell above it, holds 5 stacks and passes 1 item every 8 ticks to the container it faces.</p>
+</details>
+
+<h3>Blink Pearls: thrown teleports that keep momentum and can wait in stasis</h3>
+<p>A thrown pearl is an entity. When it touches a block or a mob, its owner teleports to that spot and takes 2 damage, wherever the owner is, as long as the pearl's chunk is loaded.</p>
+<p><strong>The exploits players will find:</strong> a pearl held in an upward current floats forever. Cut the current with Ley and it lands, pulling you home from anywhere: a stasis chamber, and a friend can pull the lever for you. Burst blocks add speed to anything above them, so a chain of them is a pearl cannon for reaching far islands.</p>
+
+<h3>Ley: redstone-like logic with signal 0 to 15</h3>
+<p>Ley wire carries a signal from 0 to 15 that drops by 1 per block. Sources set it, components delay or compare it, and outputs act on the world.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Kind</th><th>Parts</th></tr></thead>
+  <tbody>
+    <tr><td>Sources</td><td>Lever; button (10-tick pulse); pressure plate (any entity); light sensor (outputs the light level); reader (outputs how full a container is)</td></tr>
+    <tr><td>Components</td><td>Repeater (1 to 4 tick delay, restores 15); inverter; comparator</td></tr>
+    <tr><td>Outputs</td><td>Lamp (light 15, which stops spawning); door; piston (pushes up to 12 blocks and what stands on them); current block; burst block; Anchor (keeps chunks loaded)</td></tr>
+  </tbody>
+</table></div>
+<p><strong>The exploit players will find:</strong> lamps are Ley outputs and spawning depends on light, so a clock can switch a farm on and off, or flash it to clear mobs out of the cap.</p>
+<details><summary>How Ley stays deterministic <small>and which quirks count as features</small></summary>
+<p>Wire changes settle inside the same tick, breadth-first from the source that changed. Repeaters and pistons queue their work, and the queue runs first in, first out at the start of the tick it's due. No update order depends on block position or memory layout, so nothing behaves like Minecraft's location-dependent quirks.</p>
+<p>The line between exploit and bug: a combination of documented rules is a feature, never patched, and the first person to build a named one earns a Codex entry. Anything that makes results depend on frame rate, latency or load order is an engine bug, and we fix it.</p>
+</details>
+
+<h3>Strain: the entity budget is a rule players can see</h3>
+<p>Each world can afford a fixed amount of simulation. More than 24 entities in one block cell take crush damage, and a chunk holding more than 200 entities draws the Null (see Story). This keeps the server inside its budget, and it turns a performance limit into a rule players design around instead of lag they suffer.</p>
+
+<h2 id="progression">Progression: each new mob breaks your last farm design</h2>
+<div class="table-wrap wide"><table>
+  <thead><tr><th>Tier</th><th>Mob</th><th>Its new rule</th><th>The farm it forces</th><th>Unlocks</th></tr></thead>
+  <tbody>
+    <tr><td class="n">1</td><td><strong>Gloomling</strong>, a shadow blob</td><td>Spawns at light 0, walks off edges, takes fall damage</td><td>Dark floors and a drop shaft</td><td>Ley wire, lamps, collectors</td></tr>
+    <tr><td class="n">2</td><td><strong>Lanternback</strong>, a beetle carrying a lantern</td><td>Won't step down more than 1 block. Lights a 7-block radius, which stops other spawns near it.</td><td>Currents to push them; Ley clocks to time the lights</td><td>Repeaters, currents, pistons</td></tr>
+    <tr><td class="n">3</td><td><strong>Kitsune Blinker</strong>, a fox spirit</td><td>When hit or stared at, teleports up to 16 blocks to a random dark cell</td><td>A trap with exactly one valid landing cell</td><td>Blink Pearls, burst blocks</td></tr>
+    <tr><td class="n">4</td><td><strong>Null Mite</strong></td><td>Spawns where Strain is high and eats blocks</td><td>Controlled Strain inside a sealed vault</td><td>Anchors, Law Shard slots</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Law Shards are the endgame.</strong> Story bosses drop them. Placing one in your island's Codex Altar amends one law inside your claim: lower the darkness a mob needs from 0 to 3, double item lifetime, or turn off fall damage. A claim holds three. This is "hack the game" taken literally.</p>
+<p><strong>The RPG layer rewards understanding.</strong> Your character levels up from Insight, earned by discovering things: reading a new rule, building a named exploit for the first time, beating a boss. Kills give none. Insight buys Arts: Sight upgrades such as seeing spawn attempts as they happen, combat moves, and building tools such as copying a structure as a blueprint. Gear is crafted from farm output, so your level shows what you understand and your gear shows what your farms produce.</p>
+
+<h2 id="story">Story: the Null is the world's garbage collector, so your farms are both the cure and the cause</h2>
+<p>The Drift is an archipelago of sky islands run by the Codex, a law engine that ticks twenty times a second. People live by its rules without seeing them. You can see them. That Sight makes you a Tickwright, which the Archive, the order that guards the Codex, treats as a crime. Now the Null, a static that deletes whatever it touches, is eating the outer islands, and the Archive's answer is to pull everyone back to the capital. Your crew's answer is to bend the Codex hard enough to push the Null back.</p>
+<ol class="steps">
+  <li><strong>Sight.</strong> Your home island frays at the edges. Pell, a retired Tickwright who lost her Sight, teaches you the first farm. Boss: the Gloom Matron, whose summoned adds are themselves farmable.</li>
+  <li><strong>Currents.</strong> The Lantern Isles. You meet Ren, an Archive agent who patches laws; on her islands your old farm designs stop working. The boss drops your first Law Shard.</li>
+  <li><strong>Blink.</strong> Pearl travel to the far isles, where you learn what the Null is: the Codex's cleanup routine, which deletes whatever costs the most to simulate. The capital hoards the budget, so the outer islands get deleted.</li>
+  <li><strong>Collection.</strong> The Null raids your islands in timed attacks called Tides, and your farms become your defenses. You climb to the capital and rewrite the budget law.</li>
+</ol>
+<p>Scenes play in the engine with the chibi models and text boxes, one to three minutes each, skippable. Story progress belongs to the world, so the crew shares it. Quests point at the next rule: "Lanternbacks won't jump down. Find another way to move them."</p>
+
+<h2 id="combat">Fast-paced mechanic, to confirm: Flash Step combat that runs on your machine first</h2>
+<p>I read "fast spcae mechin" as fast-paced combat and movement. If you meant mechs or ships, question 1 rewrites this section.</p>
+<p>The core is a dash with two charges and brief invulnerability, a short combo that cancels into the dash, and a parry that refunds a charge. Late game, a Blink Pearl thrown mid-fight lands you behind an enemy. Combat happens on new islands, in boss arenas and during Tides, where your kill chambers, lamp walls and currents fight alongside you. Your own movement runs on your machine with the shared simulation and the server corrects it, so it responds instantly at 100 ms ping.</p>
+<details><summary>Combat numbers <small>dash, input forgiveness, parry window</small></summary>
+<p>Dash: 4 blocks, 2 charges, 0.8 s recharge each, invulnerable for the first 0.15 s. Inputs forgive the way Celeste's do: you can still jump for 100 ms after leaving a ledge, and jump, dash and attack presses are buffered for 120 ms. Attacks: a 3-hit light combo and a charged heavy. Parry: block within 150 ms of a hit to stagger the attacker. The server confirms hits on mobs.</p>
+</details>
+
+<h2 id="art">Art: an anime diorama built in code, from one palette, with no textures</h2>
+<div class="swatches" role="list" aria-label="Game palette">
+  <div class="swatch" role="listitem"><i style="background:#8ec5ff"></i>Sky<br><code>#8ec5ff</code></div>
+  <div class="swatch" role="listitem"><i style="background:#ffd6a5"></i>Horizon<br><code>#ffd6a5</code></div>
+  <div class="swatch" role="listitem"><i style="background:#7ccf6b"></i>Grass<br><code>#7ccf6b</code></div>
+  <div class="swatch" role="listitem"><i style="background:#b07a52"></i>Dirt<br><code>#b07a52</code></div>
+  <div class="swatch" role="listitem"><i style="background:#a7a9b8"></i>Stone<br><code>#a7a9b8</code></div>
+  <div class="swatch" role="listitem"><i style="background:#c98f5a"></i>Wood<br><code>#c98f5a</code></div>
+  <div class="swatch" role="listitem"><i style="background:#2b2550"></i>Gloom<br><code>#2b2550</code></div>
+  <div class="swatch" role="listitem"><i style="background:#7cf2ff"></i>Gloom eyes<br><code>#7cf2ff</code></div>
+  <div class="swatch" role="listitem"><i style="background:#b69cff"></i>Essence<br><code>#b69cff</code></div>
+  <div class="swatch" role="listitem"><i style="background:#ff5a7a"></i>Ley signal<br><code>#ff5a7a</code></div>
+  <div class="swatch" role="listitem"><i style="background:#ffd36b"></i>Lamp<br><code>#ffd36b</code></div>
+  <div class="swatch" role="listitem"><i style="background:#5d5a9a"></i>Shadow tint<br><code>#5d5a9a</code></div>
+  <div class="swatch" role="listitem"><i style="background:#2a2238"></i>Outline<br><code>#2a2238</code></div>
+  <div class="swatch" role="listitem"><i style="background:#ffe0c7"></i>Skin<br><code>#ffe0c7</code></div>
+  <div class="swatch" role="listitem"><i style="background:#ff8fb1"></i>Hair accent<br><code>#ff8fb1</code></div>
+  <div class="swatch" role="listitem"><i style="background:#6c8cff"></i>Cloth<br><code>#6c8cff</code></div>
+</div>
+<ul>
+  <li><strong>Shading.</strong> Two-band cel shading where shadows shift toward cool purple instead of grey. Blocks get per-corner ambient occlusion, characters a rim light. One screen-space pass draws dark plum outlines on everything, so terrain, mobs and players share one line style.</li>
+  <li><strong>Blocks.</strong> Flat palette colors with a slight per-block hue shift. Without image textures, every block matches by construction and the download stays small.</li>
+  <li><strong>Characters and mobs.</strong> Built in code from rounded boxes and spheres, with big decal eyes and procedural animation: bob, squash and stretch, limb swing. The Gloomling is an indigo blob with glowing cyan eyes that squashes when it lands.</li>
+  <li><strong>Camera.</strong> Perspective with a narrow 30° field of view at about 55° pitch, so it reads like an isometric diorama but keeps the depth cues you need to build. Q and E rotate in 45° steps, the wheel zooms, and you aim with the mouse cursor.</li>
+  <li><strong>Cutaway.</strong> Farms live in dark roofed rooms that a high camera can't see into. When you walk under a roof, everything above your head fades out, and a layer key slices the world at any height while you build.</li>
+</ul>
+
+<h2 id="multiplayer">Multiplayer: private co-op worlds, each run by one authoritative server</h2>
+<p>A world holds 1 to 8 players who join by invite link; the owner can grant build rights. The server runs the real simulation at 20 ticks a second. Your browser predicts your own movement with the same code and draws everyone else 100 ms in the past, smoothed between snapshots. Block edits show at once on your screen and roll back if the server rejects them. Worlds save to storage every 10 seconds and when the last player leaves.</p>
+
+<div class="flow wide" role="img" aria-label="Browser loads the client from Vercel, signs in with Clerk, then opens a WebSocket to a Cloudflare Worker that routes it to the world's Durable Object, which runs the simulation and saves chunks to its own SQLite storage">
+  <div class="node"><b>Browser</b><span>Three.js client from Vercel; predicts your moves</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>Clerk</b><span>sign-in; short-lived session token</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>Worker</b><span>routes <code>/world/:id</code>, checks the token</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node hl"><b>World object</b><span>one per world; runs the sim at 20 Hz</span></div><div class="arrow" aria-hidden="true">→</div>
+  <div class="node"><b>SQLite</b><span>inside the object; chunks and players</span></div>
+</div>
+
+<p>Vercel can't hold long-lived WebSockets, so the game server runs elsewhere. I recommend <strong>Cloudflare Durable Objects with PartyServer</strong>, because a Durable Object is one addressable, single-threaded room with storage attached, which is the exact shape of an authoritative world server, and it costs nothing while the world is empty.</p>
+<details><summary>Server options compared <small>cost and limits, checked 13 Oct 2026</small></summary>
+<div class="table-wrap"><table>
+  <thead><tr><th>Option</th><th>Rooms and storage</th><th>Cost</th><th>Main limit</th></tr></thead>
+  <tbody>
+    <tr class="pick"><td><strong>Durable Objects + PartyServer</strong> <span class="tag info">pick</span></td><td>One object per world, found by world ID; SQLite storage built in, 10 GB per object</td><td>$0 while empty. Free plan: 13,000 GB-s a day, about 28 hours of one world running. Paid: about $4.13 per always-on world per month.</td><td>128 MB per world and one thread. CPU limit is 30 s per incoming message, reset by each message.</td></tr>
+    <tr><td>Colyseus on Fly or Railway</td><td>Rooms inside a Node process you run; you add a database</td><td>A VM billed around the clock (price not checked)</td><td>You run, scale and route the processes yourself</td></tr>
+    <tr><td>Plain Node WebSocket server on a VPS</td><td>All yours to write</td><td>A VM billed around the clock</td><td>Everything, including reconnects and routing</td></tr>
+  </tbody>
+</table></div>
+</details>
+<p>The simulation lives in its own package with no Cloudflare code in it, so moving to a Node server later would mean rewriting a thin adapter, not the game.</p>
+
+<h2 id="principles">The design principles behind these choices</h2>
+<div class="table-wrap wide"><table>
+  <thead><tr><th>Principle</th><th>What it makes us do</th><th>What it rules out</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Show the rule</strong></td><td>Sight draws light, spawn checks with the reason they fail, the mob cap and signals; the Codex lists exact numbers</td><td>Hidden modifiers and rules that only a wiki explains</td></tr>
+    <tr><td><strong>Simple rules, deep combinations</strong> (emergence, as in Salen and Zimmerman's <em>Rules of Play</em>)</td><td>Every rule fits one sentence; items, mobs, pearls and players share one physics</td><td>Special cases such as "pearls ignore currents"</td></tr>
+    <tr><td><strong>Determinism</strong></td><td>Fixed 20 Hz tick, documented phase order, seeded randomness</td><td>Frame-rate-dependent physics and update order that depends on memory layout</td></tr>
+    <tr><td><strong>Exploits are content</strong></td><td>Combinations of documented rules are never patched outside Ren's story islands; finding one earns Insight</td><td>Balance patches that silently break players' farms</td></tr>
+    <tr><td><strong>One rule at a time</strong> (Koichi Hayashida's introduce, develop, twist, conclude structure from <em>Super Mario 3D Land</em>)</td><td>Each mob brings one new rule, and its island has a twist that breaks the obvious farm</td><td>Front-loaded tutorials</td></tr>
+    <tr><td><strong>Two loops that feed each other</strong> (the MDA framework: Hunicke, LeBlanc and Zubek, 2004)</td><td>Farms make power, combat tests it and opens the next mob; XP comes from discovery</td><td>Grinding kills for XP, or farms with nothing to spend on</td></tr>
+    <tr><td><strong>Fair, fast controls</strong></td><td>Input buffering, ledge grace, dash invulnerability, local prediction</td><td>Waiting on the server before your character moves</td></tr>
+    <tr><td><strong>Co-op over competition</strong> (relatedness, from self-determination theory)</td><td>Shared world and story; roles form naturally (builder, fighter, logic person)</td><td>PvP in a world full of shared builds</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="tech">Tech plan: one simulation package that both the browser and the server run</h2>
+<pre><code>packages/sim      the rules: blocks, light, spawning, entities
+packages/net      binary messages, shared
+apps/client       Vite + Three.js renderer, input, HUD
+apps/server       Worker + one Durable Object per world</code></pre>
+<p>The simulation package avoids <code>Math.random</code>, clocks and trigonometry, because browsers may round those differently; tests replay a seed and inputs and compare state hashes. Chunks are 16-block cubes, greedy-meshed in a Web Worker with light and ambient occlusion baked in, and mobs and items are instanced, so 500 items cost one draw call. The budget is 60 fps on an integrated laptop GPU, under 150 draw calls, no allocations per frame, and a server tick under 10 ms with 8 players and 500 entities.</p>
+
+<h2 id="slice">First playable slice: done means two people can farm together</h2>
+<ol class="steps">
+  <li>Open the site, sign in with Clerk (or play as a guest in local dev), and land on a small sky island with a ruin that is a working mini farm, so the loop is visible in the first minute.</li>
+  <li>Move with WASD and jump with Space. Q and E rotate the camera and the wheel zooms. The cutaway reveals roofed rooms.</li>
+  <li>Left click breaks and right click places five block types. The other player sees the change.</li>
+  <li>Gloomlings spawn only where the rules allow, and Sight (Tab) shows light levels and why each cell can or can't spawn.</li>
+  <li>A dark platform with a drop shaft produces Gloom Essence. Items drop, merge and get picked up.</li>
+  <li>Two browser windows in the same world see each other move, build and fight.</li>
+  <li>The world survives a server restart.</li>
+  <li>Frame time measured on a mid laptop and reported with method and spread; target p95 at or under 16.7 ms.</li>
+</ol>
+<p>Out of scope for this slice: story scenes, full combat, pearls, Ley, crafting, touch controls, PvP, offline simulation and any production deploy. Deploying a preview to Vercel is in scope once it runs locally.</p>
+
+<h2 id="risks">Risks, found by assuming the slice failed</h2>
+<div class="table-wrap wide"><table>
+  <thead><tr><th>If it failed because</th><th>What I'll do</th></tr></thead>
+  <tbody>
+    <tr><td>Players couldn't see into roofed farms from the 2.5D camera</td><td>Cutaway and layer view are in the slice, tested with a real roofed farm</td></tr>
+    <tr><td>Players couldn't tell why nothing spawned</td><td>Sight shows the failing check per cell ("light 4", "player too close"); the simulation already knows the reason</td></tr>
+    <tr><td>Big farms blew the 128 MB limit or the server tick budget</td><td>Bounded islands, the Strain entity budget, and server tick time logged from day one</td></tr>
+    <tr><td>Client prediction drifted from the server</td><td>Integer grid rules, banned non-deterministic calls, and replay tests that compare state hashes</td></tr>
+    <tr><td>Integrated GPUs choked on the outline pass</td><td>Measure first; outlines become a quality setting if they cost too much</td></tr>
+    <tr><td>Scope: sandbox, RPG and action game at once</td><td>The slice proves only sandbox plus multiplayer; story and combat come after it plays well</td></tr>
+  </tbody>
+</table></div>
+
+<details><summary>Accounts you'll need later <small>local development needs none of them</small></summary>
+<ul>
+  <li><strong>Clerk.</strong> An application in the Clerk dashboard. I'll pull the keys with the Clerk CLI after you log it in, or ask through T3's private secret prompt, never in chat.</li>
+  <li><strong>Cloudflare.</strong> A free account, then <code>npx wrangler login</code> on this machine when we deploy the server.</li>
+  <li><strong>Vercel.</strong> A free account, then <code>npx vercel login</code> when we deploy the preview. The Vercel CLI isn't installed yet; <code>npx</code> covers it.</li>
+</ul>
+</details>
+
+</main>
+<footer><p>Sources: Cloudflare Durable Objects <a href="https://developers.cloudflare.com/durable-objects/platform/pricing/">pricing</a> and <a href="https://developers.cloudflare.com/durable-objects/platform/limits/">limits</a>, read 13 Oct 2026. The $4.13 figure is Cloudflare's example of 100 always-on objects at $412.50 a month, divided by 100. Package versions checked on npm the same day: three 0.186.1, vite 8.3.4, partyserver 0.5.10, wrangler 4.150.0, @clerk/clerk-js 6.39.0. Nothing in this design has been built or measured yet.</p></footer>
+<script>/* Print every folded section. */ addEventListener("beforeprint", () => document.querySelectorAll("details").forEach((d) => (d.open = true)));</script>
+</body>
+</html>
