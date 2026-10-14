@@ -1,0 +1,18 @@
+{
+  "beforeRestart": {
+    "tick": 5103,
+    "revision": 5501,
+    "harvested": 26,
+    "marker": 1,
+    "blocksHash": "51d398c747480beed3a5f7e6874721a92d9188765fb8490a9f8ed3af1f2de6f0"
+  },
+  "afterRestart": {
+    "joined": true,
+    "tick": 5348,
+    "revision": 5501,
+    "harvested": 26,
+    "marker": 1,
+    "save": "Saved in Convex"
+  },
+  "action": "Placed meadow at (12,4,7) using actual right click; second client observed it. Disconnected both clients, verified last-player save, stopped verified owned supervisor tree, restarted all services, joined via UI, read restored marker."
+}

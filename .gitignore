@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.local/
+.wrangler/
+.vercel/
+.env*
+!.env.example
+.dev.vars*
+.claude/skills

@@ -1,0 +1,130 @@
+{
+  "date": "2026-10-14",
+  "build": "production Vite preview",
+  "room": "qa-slice-2",
+  "cpu": "AMD Ryzen 9 8945HS, 16 logical processors, sampled 100% load",
+  "renderer": "ANGLE Vulkan SwiftShader software renderer",
+  "measurement": "Five sequential 3-second rAF windows, first interval discarded; two clients, stationary camera; no comparative speed claim. A preceding 25-second evaluation exceeded the tool response timeout and is excluded.",
+  "samples": [
+    {
+      "count": 10,
+      "p50": 316.70000000001164,
+      "p95": 366.69999999998254,
+      "durationMs": 3193.7999999998137,
+      "startTick": 3878,
+      "endTick": 3920,
+      "players": 2,
+      "mobs": 33,
+      "drops": 107,
+      "drawCalls": 39,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1.5
+      }
+    },
+    {
+      "count": 10,
+      "p50": 316.70000000001164,
+      "p95": 333.30000000001746,
+      "durationMs": 3190.8000000002794,
+      "startTick": 4000,
+      "endTick": 4040,
+      "players": 2,
+      "mobs": 32,
+      "drops": 114,
+      "drawCalls": 39,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1.5
+      }
+    },
+    {
+      "count": 10,
+      "p50": 316.69999999998254,
+      "p95": 333.4000000000233,
+      "durationMs": 3178.899999999907,
+      "startTick": 4082,
+      "endTick": 4126,
+      "players": 2,
+      "mobs": 28,
+      "drops": 121,
+      "drawCalls": 39,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1.5
+      }
+    },
+    {
+      "count": 10,
+      "p50": 316.6000000000058,
+      "p95": 316.70000000001164,
+      "durationMs": 3087.7999999998137,
+      "startTick": 4198,
+      "endTick": 4246,
+      "players": 2,
+      "mobs": 26,
+      "drops": 128,
+      "drawCalls": 39,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1.5
+      }
+    },
+    {
+      "count": 11,
+      "p50": 300,
+      "p95": 316.5999999999767,
+      "durationMs": 3220,
+      "startTick": 4260,
+      "endTick": 4312,
+      "players": 2,
+      "mobs": 25,
+      "drops": 128,
+      "drawCalls": 39,
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1.5
+      }
+    }
+  ],
+  "console": [
+    {
+      "level": "warning",
+      "text": "[.WebGL-0x2fe4001f1a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "timestamp": "2026-10-14T04:58:08.801Z"
+    },
+    {
+      "level": "warning",
+      "text": "[.WebGL-0x2fe4001f1a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "timestamp": "2026-10-14T04:58:09.023Z"
+    },
+    {
+      "level": "warning",
+      "text": "[.WebGL-0x2fe4001f1a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+      "timestamp": "2026-10-14T04:58:09.194Z"
+    },
+    {
+      "level": "warning",
+      "text": "[.WebGL-0x2fe4001f1a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+      "timestamp": "2026-10-14T04:58:09.396Z"
+    }
+  ],
+  "verified": [
+    "Two distinct players present and movement replicated",
+    "Actual pointer place and break reflected in second client",
+    "Jump, dash, Sight and cutaway exercised",
+    "Automated mob farm generated drops; movement collected 26 essence",
+    "Convex save survived process restart; browser restored revision 5500 and harvested 26"
+  ],
+  "limits": [
+    "60 FPS on hardware GPU unverified; software renderer misses target",
+    "Clerk hosted login and deployment unverified",
+    "Player pocket inventory resets on local guest reconnect",
+    "Eight-client capacity untested; two tested"
+  ]
+}
