@@ -1,0 +1,585 @@
+{
+  "room": "qa-m1-1015-b",
+  "initial": {
+    "joined": true,
+    "room": "qa-m1-1015-b",
+    "id": "1aehK6ma7xAbnnAa_DPiE",
+    "tick": 303,
+    "seed": 740355335,
+    "revision": 0,
+    "players": [
+      {
+        "id": "1aehK6ma7xAbnnAa_DPiE",
+        "name": "M1 Alice",
+        "color": 0,
+        "x": 0.5,
+        "y": 56,
+        "z": 0.5,
+        "vy": 0,
+        "grounded": true,
+        "ack": 160,
+        "facingX": 0,
+        "facingZ": -1,
+        "coyote": 2,
+        "jumpBuffer": 0,
+        "inventory": {},
+        "progress": {
+          "insight": 0,
+          "arts": []
+        }
+      },
+      {
+        "id": "pZR2b30c8fF-fH2FofiMU",
+        "name": "M1 Bob",
+        "color": 1,
+        "x": 0.5,
+        "y": 56,
+        "z": 0.5,
+        "vy": 0,
+        "grounded": true,
+        "ack": 138,
+        "facingX": 0,
+        "facingZ": -1,
+        "coyote": 2,
+        "jumpBuffer": 0,
+        "inventory": {},
+        "progress": {
+          "insight": 0,
+          "arts": []
+        }
+      }
+    ],
+    "predicted": {
+      "id": "1aehK6ma7xAbnnAa_DPiE",
+      "name": "M1 Alice",
+      "color": 0,
+      "x": 0.5,
+      "y": 56,
+      "z": 0.5,
+      "vy": 0,
+      "grounded": true,
+      "ack": 161,
+      "facingX": 0,
+      "facingZ": -1,
+      "coyote": 2,
+      "jumpBuffer": 0,
+      "inventory": {},
+      "progress": {
+        "insight": 0,
+        "arts": []
+      }
+    },
+    "renderedPlayers": [
+      {
+        "id": "pZR2b30c8fF-fH2FofiMU",
+        "name": "M1 Bob",
+        "color": 1,
+        "x": 0.5,
+        "y": 56,
+        "z": 0.5,
+        "vy": 0,
+        "grounded": true,
+        "ack": 137,
+        "facingX": 0,
+        "facingZ": -1,
+        "coyote": 2,
+        "jumpBuffer": 0,
+        "inventory": {},
+        "progress": {
+          "insight": 0,
+          "arts": []
+        }
+      },
+      {
+        "id": "1aehK6ma7xAbnnAa_DPiE",
+        "name": "M1 Alice",
+        "color": 0,
+        "x": 0.5,
+        "y": 56,
+        "z": 0.5,
+        "vy": 0,
+        "grounded": true,
+        "ack": 161,
+        "facingX": 0,
+        "facingZ": -1,
+        "coyote": 2,
+        "jumpBuffer": 0,
+        "inventory": {},
+        "progress": {
+          "insight": 0,
+          "arts": []
+        }
+      }
+    ],
+    "online": 2,
+    "save": "New world",
+    "sections": 280,
+    "columns": 113,
+    "lodColumns": 302,
+    "sectionPackets": 1412,
+    "binaryBytes": 2404685,
+    "pendingInputs": 1,
+    "pendingEdits": 0,
+    "confirmations": 0,
+    "rollbacks": 0,
+    "camera": "third",
+    "pointerLocked": false,
+    "hover": {
+      "x": 1,
+      "y": 55,
+      "z": -6,
+      "nx": 0,
+      "ny": 1,
+      "nz": 0,
+      "block": 1
+    },
+    "meshJobs": 361,
+    "meshes": 279,
+    "drawCalls": 85,
+    "triangles": 108064,
+    "viewport": {
+      "width": 1280,
+      "height": 800,
+      "dpr": 1.5
+    },
+    "frames": 279,
+    "light": {
+      "sky": 15,
+      "block": 0,
+      "effective": 15
+    }
+  },
+  "placement": [
+    {
+      "tick": 737,
+      "players": [
+        {
+          "id": "1aehK6ma7xAbnnAa_DPiE",
+          "name": "M1 Alice",
+          "color": 0,
+          "x": 1.8000000000000003,
+          "y": 56,
+          "z": 0.5,
+          "vy": 0,
+          "grounded": true,
+          "ack": 315,
+          "facingX": 1,
+          "facingZ": 0,
+          "coyote": 2,
+          "jumpBuffer": 0,
+          "inventory": {},
+          "progress": {
+            "insight": 0,
+            "arts": []
+          }
+        },
+        {
+          "id": "pZR2b30c8fF-fH2FofiMU",
+          "name": "M1 Bob",
+          "color": 1,
+          "x": 0.5,
+          "y": 56,
+          "z": -0.7999999999999999,
+          "vy": 0,
+          "grounded": true,
+          "ack": 293,
+          "facingX": 0,
+          "facingZ": -1,
+          "coyote": 2,
+          "jumpBuffer": 0,
+          "inventory": {},
+          "progress": {
+            "insight": 0,
+            "arts": []
+          }
+        }
+      ],
+      "block": 4,
+      "confirmations": 1,
+      "rollbacks": 0,
+      "pending": 0,
+      "hover": {
+        "x": 3,
+        "y": 56,
+        "z": -2,
+        "nx": 0,
+        "ny": 0,
+        "nz": 1,
+        "block": 4
+      }
+    },
+    {
+      "tick": 741,
+      "players": [
+        {
+          "id": "pZR2b30c8fF-fH2FofiMU",
+          "name": "M1 Bob",
+          "color": 1,
+          "x": 0.5,
+          "y": 56,
+          "z": -0.7999999999999999,
+          "vy": 0,
+          "grounded": true,
+          "ack": 295,
+          "facingX": 0,
+          "facingZ": -1,
+          "coyote": 2,
+          "jumpBuffer": 0,
+          "inventory": {},
+          "progress": {
+            "insight": 0,
+            "arts": []
+          }
+        },
+        {
+          "id": "1aehK6ma7xAbnnAa_DPiE",
+          "name": "M1 Alice",
+          "color": 0,
+          "x": 1.8000000000000003,
+          "y": 56,
+          "z": 0.5,
+          "vy": 0,
+          "grounded": true,
+          "ack": 317,
+          "facingX": 1,
+          "facingZ": 0,
+          "coyote": 2,
+          "jumpBuffer": 0,
+          "inventory": {},
+          "progress": {
+            "insight": 0,
+            "arts": []
+          }
+        }
+      ],
+      "block": 4,
+      "confirmations": 0,
+      "rollbacks": 0,
+      "pending": 0,
+      "hover": {
+        "x": 1,
+        "y": 55,
+        "z": -7,
+        "nx": 0,
+        "ny": 1,
+        "nz": 0,
+        "block": 1
+      }
+    }
+  ],
+  "final": [
+    {
+      "state": {
+        "joined": true,
+        "room": "qa-m1-1015-b",
+        "id": "1aehK6ma7xAbnnAa_DPiE",
+        "tick": 1473,
+        "seed": 740355335,
+        "revision": 3,
+        "players": [
+          {
+            "id": "1aehK6ma7xAbnnAa_DPiE",
+            "name": "M1 Alice",
+            "color": 0,
+            "x": 1.8000000000000003,
+            "y": 56,
+            "z": 0.5,
+            "vy": 0,
+            "grounded": true,
+            "ack": 575,
+            "facingX": 1,
+            "facingZ": 0,
+            "coyote": 2,
+            "jumpBuffer": 0,
+            "inventory": {},
+            "progress": {
+              "insight": 0,
+              "arts": []
+            }
+          },
+          {
+            "id": "pZR2b30c8fF-fH2FofiMU",
+            "name": "M1 Bob",
+            "color": 1,
+            "x": 0.5,
+            "y": 56,
+            "z": -0.7999999999999999,
+            "vy": 0,
+            "grounded": true,
+            "ack": 555,
+            "facingX": 0,
+            "facingZ": -1,
+            "coyote": 2,
+            "jumpBuffer": 0,
+            "inventory": {},
+            "progress": {
+              "insight": 0,
+              "arts": []
+            }
+          }
+        ],
+        "predicted": {
+          "id": "1aehK6ma7xAbnnAa_DPiE",
+          "name": "M1 Alice",
+          "color": 0,
+          "x": 1.8000000000000003,
+          "y": 56,
+          "z": 0.5,
+          "vy": 0,
+          "grounded": true,
+          "ack": 576,
+          "facingX": 1,
+          "facingZ": 0,
+          "coyote": 2,
+          "jumpBuffer": 0,
+          "inventory": {},
+          "progress": {
+            "insight": 0,
+            "arts": []
+          }
+        },
+        "renderedPlayers": [
+          {
+            "id": "pZR2b30c8fF-fH2FofiMU",
+            "name": "M1 Bob",
+            "color": 1,
+            "x": 0.5,
+            "y": 56,
+            "z": -0.7999999999999999,
+            "vy": 0,
+            "grounded": true,
+            "ack": 553,
+            "facingX": 0,
+            "facingZ": -1,
+            "coyote": 2,
+            "jumpBuffer": 0,
+            "inventory": {},
+            "progress": {
+              "insight": 0,
+              "arts": []
+            }
+          },
+          {
+            "id": "1aehK6ma7xAbnnAa_DPiE",
+            "name": "M1 Alice",
+            "color": 0,
+            "x": 1.8000000000000003,
+            "y": 56,
+            "z": 0.5,
+            "vy": 0,
+            "grounded": true,
+            "ack": 576,
+            "facingX": 1,
+            "facingZ": 0,
+            "coyote": 2,
+            "jumpBuffer": 0,
+            "inventory": {},
+            "progress": {
+              "insight": 0,
+              "arts": []
+            }
+          }
+        ],
+        "online": 2,
+        "save": "Saved in Convex",
+        "sections": 280,
+        "columns": 113,
+        "lodColumns": 328,
+        "sectionPackets": 1443,
+        "binaryBytes": 2516601,
+        "pendingInputs": 1,
+        "pendingEdits": 0,
+        "confirmations": 1,
+        "rollbacks": 0,
+        "camera": "first",
+        "pointerLocked": true,
+        "hover": {
+          "x": 1,
+          "y": 55,
+          "z": -6,
+          "nx": 0,
+          "ny": 1,
+          "nz": 0,
+          "block": 1
+        },
+        "meshJobs": 439,
+        "meshes": 279,
+        "drawCalls": 81,
+        "triangles": 112398,
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1.5
+        },
+        "frames": 1102,
+        "light": {
+          "sky": 15,
+          "block": 9,
+          "effective": 15
+        }
+      },
+      "marker": 4
+    },
+    {
+      "state": {
+        "joined": true,
+        "room": "qa-m1-1015-b",
+        "id": "pZR2b30c8fF-fH2FofiMU",
+        "tick": 1477,
+        "seed": 740355335,
+        "revision": 3,
+        "players": [
+          {
+            "id": "pZR2b30c8fF-fH2FofiMU",
+            "name": "M1 Bob",
+            "color": 1,
+            "x": 0.5,
+            "y": 56,
+            "z": -0.7999999999999999,
+            "vy": 0,
+            "grounded": true,
+            "ack": 556,
+            "facingX": 0,
+            "facingZ": -1,
+            "coyote": 2,
+            "jumpBuffer": 0,
+            "inventory": {},
+            "progress": {
+              "insight": 0,
+              "arts": []
+            }
+          },
+          {
+            "id": "1aehK6ma7xAbnnAa_DPiE",
+            "name": "M1 Alice",
+            "color": 0,
+            "x": 1.8000000000000003,
+            "y": 56,
+            "z": 0.5,
+            "vy": 0,
+            "grounded": true,
+            "ack": 576,
+            "facingX": 1,
+            "facingZ": 0,
+            "coyote": 2,
+            "jumpBuffer": 0,
+            "inventory": {},
+            "progress": {
+              "insight": 0,
+              "arts": []
+            }
+          }
+        ],
+        "predicted": {
+          "id": "pZR2b30c8fF-fH2FofiMU",
+          "name": "M1 Bob",
+          "color": 1,
+          "x": 0.5,
+          "y": 56,
+          "z": -0.7999999999999999,
+          "vy": 0,
+          "grounded": true,
+          "ack": 557,
+          "facingX": 0,
+          "facingZ": -1,
+          "coyote": 2,
+          "jumpBuffer": 0,
+          "inventory": {},
+          "progress": {
+            "insight": 0,
+            "arts": []
+          }
+        },
+        "renderedPlayers": [
+          {
+            "id": "1aehK6ma7xAbnnAa_DPiE",
+            "name": "M1 Alice",
+            "color": 0,
+            "x": 1.8000000000000003,
+            "y": 56,
+            "z": 0.5,
+            "vy": 0,
+            "grounded": true,
+            "ack": 575,
+            "facingX": 1,
+            "facingZ": 0,
+            "coyote": 2,
+            "jumpBuffer": 0,
+            "inventory": {},
+            "progress": {
+              "insight": 0,
+              "arts": []
+            }
+          },
+          {
+            "id": "pZR2b30c8fF-fH2FofiMU",
+            "name": "M1 Bob",
+            "color": 1,
+            "x": 0.5,
+            "y": 56,
+            "z": -0.7999999999999999,
+            "vy": 0,
+            "grounded": true,
+            "ack": 557,
+            "facingX": 0,
+            "facingZ": -1,
+            "coyote": 2,
+            "jumpBuffer": 0,
+            "inventory": {},
+            "progress": {
+              "insight": 0,
+              "arts": []
+            }
+          }
+        ],
+        "online": 2,
+        "save": "Saved in Convex",
+        "sections": 272,
+        "columns": 113,
+        "lodColumns": 328,
+        "sectionPackets": 901,
+        "binaryBytes": 1623067,
+        "pendingInputs": 1,
+        "pendingEdits": 0,
+        "confirmations": 2,
+        "rollbacks": 0,
+        "camera": "third",
+        "pointerLocked": false,
+        "hover": {
+          "x": 3,
+          "y": 56,
+          "z": -2,
+          "nx": 0,
+          "ny": 0,
+          "nz": 1,
+          "block": 4
+        },
+        "meshJobs": 506,
+        "meshes": 271,
+        "drawCalls": 106,
+        "triangles": 132954,
+        "viewport": {
+          "width": 1280,
+          "height": 800,
+          "dpr": 1.5
+        },
+        "frames": 1092,
+        "light": {
+          "sky": 15,
+          "block": 14,
+          "effective": 15
+        }
+      },
+      "marker": 4
+    }
+  ],
+  "actions": [
+    "Alice D 650ms; Bob observed x 0.5 -> 1.8",
+    "Bob W 650ms; Alice observed z 0.5 -> -0.8",
+    "Alice selected Lantern and right-clicked projected ground at 3,55,-2; both read block 4 at 3,56,-2",
+    "Bob left-clicked lantern; Alice read 0",
+    "Bob replaced lantern; both read 4",
+    "Alice V toggled first person and Capture mouse acquired Pointer Lock. T3 Escape did not release the lock; explicit Escape handling is being added."
+  ],
+  "browser": "T3 preview, two independent tabs; no gameplay setters"
+}

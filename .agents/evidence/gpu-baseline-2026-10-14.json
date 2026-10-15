@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-14",
+  "build": "production Vite preview (node scripts/dev.mjs --preview), commit e84de1f",
+  "harness": "node scripts/measure-gpu.mjs <low|high> on",
+  "method": "Visible Chrome, ANGLE D3D11, vsync on, 1 client, stationary camera, 5 s warmup, five 3 s windows. GPU ms from EXT_disjoint_timer_query_webgl2 around the game's rAF callback only. Each GPU run was done twice, alternating low/high.",
+  "viewport": "1906x930 CSS px at DPR 1.25 (2383x1163 render px)",
+  "scene": "36 draw calls, ~48k triangles, 10-18 mobs, 3-12 drops; world tick advanced ~50 ticks per window",
+  "results": {
+    "AMD Radeon 780M (integrated)": { "fps": 60, "frameP50Ms": 16.7, "gpuP50Ms": "2.04-2.12 across 10 windows", "gpuP95Ms": "2.26-2.63" },
+    "NVIDIA RTX 4060 Laptop": { "fps": 60, "frameP50Ms": 16.7, "gpuP50Ms": "0.37-1.73 (rises as GPU clocks down under light load)" }
+  },
+  "limiter": "Display vsync at 60 Hz. GPU is busy ~2 ms of each 16.7 ms frame on the 780M.",
+  "errors": "One 404 for a static resource per page load; no script errors.",
+  "notCovered": "Two clients, heavy farms, and the new renderer. Rerun after every rendering milestone."
+}

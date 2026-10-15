@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Tickwright v2: hack the rules, shoot what they grow</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f7f7f5; --surface: #ecece8; --line: #d6d6d0;
+  --text: #1b1b1a; --text-2: #42423e; --text-3: #5e5e58;
+  --accent: #2756a8; --accent-bg: #e4ebf8;
+  --ok: #23703a; --warn: #8a5a00;
+  --ley: #c2410c; --gloom: #6d4fb3; --bronze: #9a6a2f; --sky: #3c8fb8;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141413; --surface: #1f1f1d; --line: #34342f;
+    --text: #ebebe7; --text-2: #c3c3bc; --text-3: #9d9d95;
+    --accent: #93b4f2; --accent-bg: #1c2840;
+    --ok: #82cf97; --warn: #e3b55a;
+    --ley: #f08a5d; --gloom: #a98cf0; --bronze: #d2a165; --sky: #7cc0e0;
+  }
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); color: var(--text); -webkit-text-size-adjust: 100%; }
+body { margin: 0; padding: 40px 20px 72px; font: 1.0625rem/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 46rem; margin: 0 auto; }
+h1, h2, h3 { line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: 2rem; font-weight: 650; letter-spacing: -0.02em; }
+h2 { font-size: 1.375rem; font-weight: 650; margin-top: 52px; }
+h3 { font-size: 1.0625rem; font-weight: 600; margin-top: 20px; }
+p, li { max-width: 62ch; text-wrap: pretty; }
+p, ul, ol, table, figure, details, dl { margin: 12px 0 0; }
+h2 + *, h3 + * { margin-top: 8px; }
+li + li { margin-top: 5px; }
+a { color: var(--accent); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::selection { background: var(--accent-bg); }
+.meta { font-size: 0.875rem; color: var(--text-3); margin-bottom: 10px; }
+.lede { font-size: 1.25rem; line-height: 1.5; color: var(--text-2); margin-top: 12px; }
+.small, figcaption, caption { font-size: 0.875rem; color: var(--text-3); }
+code { font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace; font-size: 0.875em; background: var(--surface); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.status { color: var(--ok); font-weight: 600; }
+
+.ask { background: var(--accent-bg); border-radius: var(--radius); padding: 18px 20px; margin-top: 24px; }
+.ask > p:first-child { margin-top: 0; font-weight: 600; }
+.ask ol { padding-left: 1.3em; }
+
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; line-height: 1.45; }
+caption { text-align: left; padding-bottom: 6px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font-weight: 600; color: var(--text-2); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.k { color: var(--text-2); white-space: nowrap; }
+
+.pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.pair { background: var(--surface); border-radius: var(--radius); padding: 12px 14px; }
+.pair b { display: block; font-weight: 600; }
+.pair span { display: block; font-size: 0.875rem; color: var(--text-3); margin-top: 2px; }
+.pair .mc { font-size: 0.875rem; color: var(--text-2); margin-top: 6px; }
+@media (max-width: 40rem) { .pairs { grid-template-columns: 1fr; } }
+
+details { border-top: 1px solid var(--line); }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+details + details { margin-top: 0; }
+h2 + details, p + details, .table-wrap + details { margin-top: 16px; }
+summary { cursor: pointer; font-weight: 600; padding-block: 0.75rem; }
+summary span { font-weight: 400; color: var(--text-3); }
+details > :not(summary) { margin-top: 8px; }
+details > :last-child { margin-bottom: 18px; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+dt { font-weight: 600; } dd { margin: 0; max-width: 56ch; }
+@media (max-width: 40rem) { dl { grid-template-columns: 1fr; } dd { margin-bottom: 8px; } body { padding: 28px 16px 56px; } h1 { font-size: 1.7rem; } }
+@media print {
+  :root { color-scheme: light; }
+  body { padding: 0; }
+  figure, table, .pairs { break-inside: avoid; } h2, h3 { break-after: avoid; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+}
+</style>
+</head>
+<body>
+<main>
+<p class="meta">Plan, <time datetime="2026-10-14">14 October 2026</time>. Replaces the spirit-water plan from earlier today.</p>
+<h1>Hack the rules, then shoot what they grow</h1>
+<p class="lede">An anime voxel world where your crew builds Minecraft-style technical farms from rules you can see, then spends the output in a fast third-person shooter.</p>
+<p><span class="status">Astra is building M1 now</span>, the engine foundation, at extra-high reasoning. The full spec Astra works from is <code>.agents/specs/tickwright-v2.md</code>.</p>
+
+<div class="ask">
+<p>Two things from you.</p>
+<ol>
+<li><strong>Run Astra in parallel?</strong> After M1, the look (M2), the shooter (M3) and the farm systems (M4) can run as three Astra threads in separate worktrees. That uses your Codex plan about three times faster, at the cost of merge work for me. Default: yes.</li>
+<li><strong>Optional: make a character in VRoid Studio</strong> (explained below). Without one, Astra uses a free placeholder.</li>
+</ol>
+</div>
+
+<h2>Your farms, as Tickwright rules</h2>
+<p>Each Minecraft farm you named has a counterpart built on our own rules. Every rule has exact numbers in the in-game Codex, and Sight draws it in the world.</p>
+<div class="pairs">
+<div class="pair"><b>Bronze farm</b><span>3 Folk who slept recently, scared by a monster, summon a Haniwa Guardian that drops Bronze.</span><div class="mc">Minecraft: iron farm</div></div>
+<div class="pair"><b>Trading hall</b><span>Lock a Folk's trades by trading once; until then, break its workstation to reroll. Cure a Wilted Folk for 50% off.</span><div class="mc">Minecraft: villager trading hall and curing</div></div>
+<div class="pair"><b>Gloomling drop farm</b><span>Dark floors, no player within 24 blocks, a drop that kills them, under the mob cap.</span><div class="mc">Minecraft: mob farm</div></div>
+<div class="pair"><b>Melon machine</b><span>A Watcher sees the fruit appear, fires a piston, a Collector sorts the drops.</span><div class="mc">Minecraft: observer melon farm</div></div>
+<div class="pair"><b>Tide farm</b><span>Kill a Wilt Captain, carry the Omen into a village, harvest 5 waves.</span><div class="mc">Minecraft: raid farm</div></div>
+<div class="pair"><b>Yomi highways and aggro traps</b><span>1 block in Yomi is 8 above. Hit one Kitsune and the pack charges your trap.</span><div class="mc">Minecraft: Nether travel and gold farms</div></div>
+</div>
+<p class="small">Also in: Ley logic with Gel blocks (flying machines), Blink Pearl stasis chambers, chunk Anchors, entity cramming, crop hydration and Bloom Dust, animal breeding.</p>
+
+<details>
+<summary>All the rules with numbers <span>tick order, spawning, items, Ley, Folk, Strain</span></summary>
+<dl>
+<dt>Tick order</dt><dd>20 ticks per second, 8 phases in a fixed, printed order: inputs, scheduled blocks, Ley, random ticks, entities, spawning, items, Folk. Randomness is seeded per world, tick and column, so a build gives the same result every time.</dd>
+<dt>Spawning</dt><dd>One attempt per loaded column per tick. Needs a solid opaque floor, 2 air above, block light 0, sky light 4 or less, no player within 24 blocks, one within 128, and the world under 30 hostiles per player.</dd>
+<dt>Items</dt><dd>Real objects with gravity and friction. They merge within 0.5 blocks and vanish after 5 minutes. A Collector moves 1 item every 8 ticks.</dd>
+<dt>Ley logic</dt><dd>Signal 0 to 15, losing 1 per block. Lever, button, pressure plate, light sensor, Reader (comparator), Watcher (observer), repeater, inverter, lamp, piston, sticky piston, Gel block, Launcher, Anchor.</dd>
+<dt>Folk</dt><dd>A bed and a workstation within 48 blocks set the profession. They work, gather and sleep on a schedule. Prices rise when trades sell out and restock twice a day.</dd>
+<dt>Guardians</dt><dd>Checked every second: 3 or more Folk within 16 blocks, slept in the last day, a hostile within 8, no Guardian seen in 30 s.</dd>
+<dt>Strain</dt><dd>More than 24 entities in one block take crush damage. Over 300 in a column calls a Null rift after a 30 s warning. This turns the server's limits into a rule you design around.</dd>
+<dt>Law Shards</dt><dd>Endgame boss drops. Each one rewrites one rule inside your claim, such as spawning at light 3 or doubled item lifetime.</dd>
+</dl>
+</details>
+
+<h2>The shooter is built for dopamine</h2>
+<p>Third person over the shoulder by default, first person on <code>V</code>. You get a reward every second, and the farms supply the ammo and gear.</p>
+<div class="table-wrap">
+<table>
+<caption>Arms are crafted from farm output; the pistol never runs dry</caption>
+<thead><tr><th scope="col">Arm</th><th scope="col">How it fires</th><th scope="col">Ammo comes from</th></tr></thead>
+<tbody>
+<tr><td class="k">Spirit Pistol</td><td>Hitscan, 6 shots/s, double damage on weak points</td><td>Infinite</td></tr>
+<tr><td class="k">Scatter</td><td>8 pellets that launch mobs into your kill chambers</td><td>Gloomling farm</td></tr>
+<tr><td class="k">Needle Rifle</td><td>Charged shot that pierces 5 enemies</td><td>Bronze farm</td></tr>
+<tr><td class="k">Bloom Launcher</td><td>Arcing explosive that breaks Wilt blocks</td><td>Ember Imp farm</td></tr>
+<tr><td class="k">Lantern Beam</td><td>Continuous beam that ramps up and burns</td><td>Lanternback farm</td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>Movement, parry and the feedback list <span>dash, slide, grapple, style meter, hit-stop</span></summary>
+<ul>
+<li>Run 6.5&nbsp;m/s, sprint 9, slide that keeps momentum, double jump, two dash charges with 150&nbsp;ms invulnerability, a grapple that pulls or swings, and later a glider with rocket boosts.</li>
+<li>Punch an incoming projectile within 150&nbsp;ms to send it back at double damage and refill a dash.</li>
+<li>Weak points with their own crit sound, hit and kill markers, damage numbers, 30 to 120&nbsp;ms hit-stop, short screen shake.</li>
+<li>Kills burst into item fountains with rarity beams. A style meter from D to SSS raises drop rates by up to 50%.</li>
+<li>Charms stack like Risk of Rain 2 items and chain off crits, kills, dashes and parries. Rare ones drop from farms, so a faster farm means more charms.</li>
+</ul>
+</details>
+
+<h2>Multiplayer is private co-op for 8</h2>
+<p>Each world is a room for up to 8 friends, joined by invite link, drop in and out. The world, its farms and the story are shared; each player keeps their own gear and level.</p>
+<details>
+<summary>How it works under the hood <span>servers, saves, lag</span></summary>
+<ul>
+<li>One server per world (a Cloudflare Durable Object) runs the real simulation 20 times a second, near whoever opened it.</li>
+<li>Only the area within 4 chunks of a player, or held by an Anchor, keeps running. The world pauses when everyone leaves.</li>
+<li>Changed chunks save to Convex every 30 seconds and when the last player leaves, never every tick.</li>
+<li>Your own movement and shots show instantly on your screen. The server checks hits by rewinding enemies to where you saw them, up to 200&nbsp;ms back.</li>
+<li>Other players show 100&nbsp;ms behind so they move smoothly. Enemy attacks wind up for at least 400&nbsp;ms, so a friend on another continent (150 to 250&nbsp;ms) can still dodge.</li>
+<li>Online play needs a sign-in through Clerk. Guests can play only on your own computer.</li>
+</ul>
+</details>
+
+<h2>Characters come from VRoid</h2>
+<p>VRoid Studio is pixiv's free anime character maker: sliders for the face and body, paint-on hair and clothes. It saves a <code>.vrm</code> file that the game loads directly.</p>
+<p>Agents can't use a drawing app well, so Astra starts with a free placeholder. Making yours takes about an hour, and every player will be able to import their own <code>.vrm</code> as their avatar.</p>
+
+<h2>Today's build runs at 60&nbsp;fps</h2>
+<p>Measured on this laptop's real GPUs, not the software renderer used before. Display refresh caps both at 60.</p>
+<div class="table-wrap">
+<table>
+<caption>Current build, 1 player, 1906 × 930 window at 125% scale, median of five 3-second windows, run twice</caption>
+<thead><tr><th scope="col">GPU</th><th scope="col" class="n">fps</th><th scope="col" class="n">GPU time per frame</th><th scope="col" class="n">Budget at 60&nbsp;fps</th></tr></thead>
+<tbody>
+<tr><td class="k">Radeon 780M (built-in)</td><td class="n">60</td><td class="n">2.0 to 2.1&nbsp;ms</td><td class="n">16.7&nbsp;ms</td></tr>
+<tr><td class="k">RTX 4060 Laptop</td><td class="n">60</td><td class="n">0.4 to 1.7&nbsp;ms</td><td class="n">16.7&nbsp;ms</td></tr>
+</tbody>
+</table>
+</div>
+<p>The new look must stay under 10&nbsp;ms on the Radeon 780M, which stands in for a typical mid laptop. Astra reruns <code>node scripts/measure-gpu.mjs low on</code> after every visual change.</p>
+<details>
+<summary>How it was measured <span>method and limits</span></summary>
+<p>A visible Chrome window, forced onto each GPU, with a GPU timer wrapped around the game's own frame. Raw numbers are in <code>.agents/evidence/gpu-baseline-2026-10-14.json</code>. The RTX number rises over the run because the GPU slows its clock when idle. Not covered yet: two players, busy farms and the new renderer. One static file returns 404 on load; nothing else errored.</p>
+</details>
+
+<h2>Eight milestones, each one playable</h2>
+<div class="table-wrap">
+<table>
+<caption>Astra builds, I review, you play</caption>
+<thead><tr><th scope="col">Milestone</th><th scope="col">What gets built</th><th scope="col">Your check</th></tr></thead>
+<tbody>
+<tr><td class="k">M1 Engine</td><td>Big generated world in chunks, light, streaming, saves, prediction</td><td>Walk and build with a friend; edits survive a restart</td></tr>
+<tr><td class="k">M2 Look</td><td>Anime toon voxels, outlines, sky, water, VRM character</td><td>Does it look good, and hold 60&nbsp;fps?</td></tr>
+<tr><td class="k">M3 Shooter</td><td>Movement, 3 Arms, parry, swarms, feedback, lag fixes</td><td>Is 5 minutes of fighting fun?</td></tr>
+<tr><td class="k">M4 Rules</td><td>Spawning, items, Ley, crops, Sight, Codex</td><td>Build a mob farm from Sight alone</td></tr>
+<tr><td class="k">M5 Folk</td><td>Villages, trading, curing, Guardians</td><td>Build a Bronze farm and a trading hall</td></tr>
+<tr><td class="k">M6 Story</td><td>Chapters 1 and 2, two bosses, Tides, Law Shards</td><td>Play both chapters in co-op</td></tr>
+<tr><td class="k">M7 Content</td><td>Three more regions, Yomi, glider, charms, chapters 3 to 6</td><td>Reach the ending</td></tr>
+<tr><td class="k">M8 Web</td><td>Fast loading, settings, gamepad, hosting</td><td>Say go before anything is deployed</td></tr>
+</tbody>
+</table>
+</div>
+<details>
+<summary>What I check after every milestone <span>before you're asked to play</span></summary>
+<ul>
+<li>Read Astra's diff and rerun <code>bun run check</code>, <code>bun run build</code> and the tests myself.</li>
+<li>Play two browser clients in a fresh world and drive the new feature the way a player would.</li>
+<li>Rerun the GPU measurement on both GPUs and compare to the budget.</li>
+<li>Compare screenshots against the look in the spec, then commit and hand you a short report.</li>
+</ul>
+</details>
+
+<details>
+<summary>Story and world <span>the Codex, the Null, six regions</span></summary>
+<p>The world runs on the Codex, a law engine ticking 20 times a second. You can see its rules, which makes you a Tickwright, a crime to the Archive that guards it. The Null deletes whatever costs the most to simulate, and it is eating the outer regions.</p>
+<ul>
+<li>Pell, your mentor, lost her Sight and hides that she once made the Null worse.</li>
+<li>Ren, an Archive agent, patches a rule in chapter 2 and your farm stops working until you find a new design. She becomes an uneasy ally.</li>
+<li>Bit, a tiny glitch sprite, tags along and rarely talks.</li>
+<li>Regions: Hoshino Meadows, Lantern Marsh, Kitsune Forest, Ember Peaks, Yomi, Archive Capital. Each brings one new rule and a boss that drops a Law Shard.</li>
+<li>The world is 2&nbsp;km across, with a landmark visible from every peak. Scenes run 30 to 90&nbsp;s and can always be skipped.</li>
+</ul>
+</details>
+
+<details>
+<summary>Risks <span>four, each with a response</span></summary>
+<ul>
+<li>Merging parallel Astra work can conflict. M1 sets clear module boundaries first, and I merge one track at a time.</li>
+<li>A voxel world at 2&nbsp;km with toon effects may miss 10&nbsp;ms on the 780M. Far terrain gets simpler meshes, and the harness catches it at M2.</li>
+<li>Farm rules can break each other's balance. Every value lives in one Codex file, so tuning is one edit, and tests pin farm output rates.</li>
+<li>Your Codex plan may run out mid-milestone. Each milestone ends playable, and I can finish a partial one with Claude.</li>
+</ul>
+</details>
+</main>
+<script>
+addEventListener("beforeprint", () => document.querySelectorAll("details").forEach((d) => { d.dataset.wasOpen = d.open; d.open = true; }));
+addEventListener("afterprint", () => document.querySelectorAll("details").forEach((d) => (d.open = d.dataset.wasOpen === "true")));
+</script>
+</body>
+</html>

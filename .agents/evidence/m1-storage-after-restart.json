@@ -1,0 +1,25 @@
+{
+  "room": "qa-m1-1015-b",
+  "meta": {
+    "version": 2,
+    "seed": 740355335,
+    "mode": "meadows",
+    "tick": 2012,
+    "revision": 3,
+    "scheduled": [],
+    "nextOrder": 0
+  },
+  "savedSections": 1,
+  "keys": [
+    "0,1,-1"
+  ],
+  "marker": {
+    "x": 3,
+    "y": 56,
+    "z": -2,
+    "value": 4,
+    "section": "0,1,-1",
+    "revision": 3,
+    "sha256": "680879495a5f5e37e1b5f297ddfd9a59ec1d6c4a71891b9d230599e1fe875551"
+  }
+}

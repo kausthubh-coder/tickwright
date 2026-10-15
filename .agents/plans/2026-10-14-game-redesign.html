@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Remake Tickwright as a spirit-water farming adventure</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f7f8f6; --surface: #eceeea; --line: #d5d9d3;
+  --text: #1a1d1b; --text-2: #3f4541; --text-3: #5c635e;
+  --accent: #17607a; --accent-bg: #e1eef2;
+  --day: #e9c77b; --dusk: #d58a64; --night: #2f3566; --wilt: #8d8a86; --sprout: #5f9a4f;
+  --radius: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131615; --surface: #1d2120; --line: #323835;
+    --text: #e8ebe8; --text-2: #c0c6c2; --text-3: #9aa29d;
+    --accent: #84c7dd; --accent-bg: #19303a;
+    --day: #c9a65a; --dusk: #b8714f; --night: #4b5296; --wilt: #77746f; --sprout: #79b866;
+  }
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); color: var(--text); -webkit-text-size-adjust: 100%; }
+body { margin: 0; padding: 40px 20px 72px; font: 1.0625rem/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 46rem; margin: 0 auto; }
+h1, h2, h3 { line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: 2.05rem; font-weight: 650; letter-spacing: -0.02em; }
+h2 { font-size: 1.4rem; font-weight: 650; margin-top: 56px; }
+h3 { font-size: 1.1rem; font-weight: 600; margin-top: 24px; }
+p, li { max-width: 62ch; text-wrap: pretty; }
+p, ul, ol, table, figure, details, dl { margin: 14px 0 0; }
+h2 + *, h3 + * { margin-top: 10px; }
+li + li { margin-top: 6px; }
+a { color: var(--accent); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::selection { background: var(--accent-bg); }
+.meta { font-size: 0.875rem; color: var(--text-3); margin-bottom: 10px; }
+.lede { font-size: 1.25rem; line-height: 1.5; color: var(--text-2); margin-top: 14px; }
+.small, figcaption, caption { font-size: 0.875rem; color: var(--text-3); }
+code { font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace; font-size: 0.9em; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+
+.ask { background: var(--accent-bg); border-radius: var(--radius); padding: 18px 20px; margin-top: 28px; }
+.ask p:first-child { margin-top: 0; font-weight: 600; }
+
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; line-height: 1.45; }
+caption { text-align: left; padding-bottom: 6px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+th { font-weight: 600; color: var(--text-2); }
+td:first-child { color: var(--text-2); white-space: nowrap; }
+
+svg text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; fill: var(--text); }
+svg .t2 { fill: var(--text-3); }
+figure { margin-left: 0; margin-right: 0; }
+.flow { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; counter-reset: none; }
+.flow li { margin: 0; padding: 10px 12px 12px; border-top: 3px solid var(--c); background: var(--surface); border-radius: 0 0 6px 6px; font-size: 0.875rem; line-height: 1.35; color: var(--text-3); }
+.flow li + li { margin-top: 0; }
+.flow b { display: block; font-size: 1.0625rem; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+@media (max-width: 40rem) { .flow { grid-template-columns: 1fr 1fr; } }
+.choices { padding-left: 1.4em; margin-top: 10px; }
+.choices li + li { margin-top: 12px; }
+.choices .alt { display: block; font-size: 0.875rem; color: var(--text-2); }
+
+details { border-top: 1px solid var(--line); }
+details:last-of-type { border-bottom: 1px solid var(--line); }
+details + details { margin-top: 0; }
+summary { cursor: pointer; font-weight: 600; padding-block: 0.75rem; }
+summary span { font-weight: 400; color: var(--text-3); }
+details > :not(summary) { margin-top: 10px; }
+details > :last-child { margin-bottom: 18px; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+dt { font-weight: 600; } dd { margin: 0; max-width: 56ch; }
+@media (max-width: 40rem) { dl { grid-template-columns: 1fr; } dd { margin-bottom: 8px; } body { padding: 28px 16px 56px; } h1 { font-size: 1.7rem; } }
+@media print {
+  :root { color-scheme: light; }
+  body { padding: 0; }
+  figure, table { break-inside: avoid; } h2, h3 { break-after: avoid; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+}
+</style>
+</head>
+<body>
+<main>
+<p class="meta">Plan, <time datetime="2026-10-14">14 October 2026</time>. Replaces the 13 October design doc.</p>
+<h1>Remake it as an anime spirit-water adventure</h1>
+<p class="lede">Your spirit-water sprayer hurts Wilt monsters, turns dead land into farmland, and waters crops. Crops come back as seed ammo, meals and stats.</p>
+
+<figure class="loop">
+<ol class="flow" aria-describedby="loopcap">
+<li style="--c: var(--wilt)"><b>Fight the Wilt</b><span>spray, slide, dodge</span></li>
+<li style="--c: var(--accent)"><b>Purify the land</b><span>grey crust becomes soil</span></li>
+<li style="--c: var(--sprout)"><b>Plant and water</b><span>with the same sprayer</span></li>
+<li style="--c: var(--day)"><b>Harvest</b><span>seed ammo, meals, stats for the next fight</span></li>
+</ol>
+<figcaption id="loopcap">Fighting is how the farm grows, and the harvest makes the next Wilt zone winnable.</figcaption>
+</figure>
+
+<div class="ask">
+<p>Reply “go” to accept every default, or change any line by number.</p>
+<ol class="choices">
+<li><b>Fast mechanic.</b> Water sprayer and perfect dodge, like Splatoon meets Genshin. <span class="alt">Instead: a mouse-aim shooter, or sword combos.</span></li>
+<li><b>Farms.</b> Crop farming. Drop block building and the mob tower. <span class="alt">Instead: keep block building for late game.</span></li>
+<li><b>Camera.</b> Over the shoulder, mouse-locked. <span class="alt">Instead: keep the high, angled camera.</span></li>
+<li><b>Characters.</b> Free placeholders now. You make the hero in VRoid Studio (free, about an hour). <span class="alt">Instead: free chibi packs only.</span></li>
+<li><b>Name.</b> Wellspring, as a working title. <span class="alt">Instead: keep Tickwright.</span></li>
+</ol>
+</div>
+
+<h2>Astra builds six playable steps</h2>
+<p>GPT-6-Astra builds each step as its own task, and I test it in two browsers before the next. The first step waits for your approval.</p>
+<div class="table-wrap">
+<table>
+<caption>Each step ends with something you can play</caption>
+<thead><tr><th scope="col">Step</th><th scope="col">You can</th><th scope="col">Done when</th></tr></thead>
+<tbody>
+<tr><td>Look</td><td>Run an anime character over a cel-shaded, grassy hill</td><td>You approve the screenshots</td></tr>
+<tr><td>Feel</td><td>Spray, slide and dodge against two Wilt monsters</td><td>Fun with two players; replay tests pass</td></tr>
+<tr><td>Farm</td><td>Plant, water, harvest, cook, fire seed shots</td><td>Crops grow and survive a restart</td></tr>
+<tr><td>Valley</td><td>Purify a 400&nbsp;m spring valley zone by zone</td><td>Purified land is plantable; night raids work</td></tr>
+<tr><td>Story</td><td>Play chapter 1 and its spring boss</td><td>Finishes start to end in co-op</td></tr>
+<tr><td>Web</td><td>Play from a link in 5&nbsp;seconds, desktop or touch</td><td>Under 20&nbsp;MB first load; deploy on your go</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Details behind each choice</h2>
+<details>
+<summary>Story <span>the Wilt, the four withered gods, who you meet</span></summary>
+<p>A drought god swallowed the rain and the islands crusted over into the grey Wilt. You wake the last spring under an old shrine and its spirit, Mizu, fills your sprayer. Mizu speaks rarely; no Paimon-style narrator.</p>
+<ul>
+<li><strong>Tsuru</strong>, the shrine keeper, tried to seal the god once and failed. She teaches you farming and hides why she failed.</li>
+<li><strong>Kaito</strong>, a forge-village rival, thinks the drought stops the floods that drowned his home. He becomes an ally in chapter 2.</li>
+<li>Each region holds one withered god. Beating it restores that season and its crops: spring rice, summer peppers, autumn pumpkins, winter frost melons.</li>
+<li>Villagers return as land is restored. Their friendship scenes (under 60&nbsp;s, skippable) teach combo moves, as Persona's Confidants do.</li>
+<li>After every expedition, win or lose, the village plays a short new exchange, as Hades does after each run.</li>
+</ul>
+</details>
+
+<details>
+<summary>World and day <span>one island, four-minute crossing, 20-minute day</span></summary>
+<p>One hand-made island about 1.2&nbsp;km across: a central village and four season regions. Walking across takes about 4&nbsp;minutes; sliding on wet ground is 1.8× faster. Hills hide the next landmark, a reward is visible from every peak, and each region has a purification meter.</p>
+<figure>
+<svg viewBox="0 0 720 78" style="width:100%;height:auto" role="img" aria-labelledby="daycap">
+  <rect x="0" y="8" width="504" height="30" fill="var(--day)"/>
+  <rect x="504" y="8" width="36" height="30" fill="var(--dusk)"/>
+  <rect x="540" y="8" width="180" height="30" fill="var(--night)"/>
+  <g font-size="13">
+    <text x="8" y="58">0 min</text>
+    <text x="8" y="74" class="t2">Farm, explore, purify, visit people</text>
+    <text x="504" y="58">14</text>
+    <text x="548" y="74" class="t2">Wilt raid on the fields</text>
+    <text x="712" y="58" text-anchor="end">20</text>
+  </g>
+</svg>
+<figcaption id="daycap">One in-game day is 20 real minutes, shared by everyone in the world. The world pauses when it's empty.</figcaption>
+</figure>
+<p>Day and night are separate phases because mixing them failed for Dave the Diver: its director "couldn't focus on either task" until he split them.</p>
+</details>
+
+<details>
+<summary>Combat and farm numbers <span>spray, dodge, seeds, stats</span></summary>
+<dl>
+<dt>Spray</dt><dd>1 water per tick at 20 ticks/s, about 6 damage, 0.6&nbsp;m splash. Tank 100. Hits paint the ground wet.</dd>
+<dt>Slide</dt><dd>On wet ground: 1.8× speed, refill 35/s. Off it: refill 5/s. Wilt ground slows to 0.6× and hurts.</dd>
+<dt>Dodge</dt><dd>2 charges, 1.5&nbsp;s recharge, 300&nbsp;ms of invulnerability. A dodge within 150&nbsp;ms of a hit is perfect: 1.2&nbsp;s of slow motion on your screen only, double damage.</dd>
+<dt>Latency</dt><dd>Every enemy attack glints for at least 450&nbsp;ms. The server judges a dodge on your timeline, up to 200&nbsp;ms back.</dd>
+<dt>Seed shots</dt><dd>One crop gives 3 seeds. Pepper becomes a fire turret, frost melon a slow field, pumpkin a wall, spirit rice a healing totem that revives.</dd>
+<dt>Stats</dt><dd>Rice quality raises permanent stats, with diminishing returns per variety so grinding can't replace skill.</dd>
+<dt>Feel</dt><dd>10 to 20&nbsp;ms hit-stop, short screen shake, white hit flash, 120&nbsp;ms input buffer, coyote time on jumps.</dd>
+</dl>
+</details>
+
+<details>
+<summary>Why it looks bad now, and the fix <span>renderer, shading, assets, budgets</span></summary>
+<p>The current build is flat-lit boxes seen from far above, with tiny characters and no outlines, sky or grass. The fix:</p>
+<ul>
+<li>three.js <code>WebGPURenderer</code> with automatic WebGL2 fallback, one shared toon material (ramp, tinted shadows, rim light).</li>
+<li>Outlines on characters, an edge pass on the world, gradient sky with toon clouds, wind-blown instanced grass, bloom.</li>
+<li>Characters as VRoid models (<code>@pixiv/three-vrm</code>), animated with Quaternius' free CC0 animation library.</li>
+<li>Scenery from Quaternius' Stylized Nature MegaKit and KayKit Forest, both CC0.</li>
+<li>Budgets for a mid laptop: 200 draw calls, 1.5M triangles, 300&nbsp;MB of textures. You check 60 fps on your laptop; the agents' software renderer can't.</li>
+</ul>
+<p>Closest reference: <a href="https://messenger.abeto.co">Messenger by Abeto</a>, a cel-shaded multiplayer three.js world that runs on phones.</p>
+</details>
+
+<details>
+<summary>What stays from the current build <span>server, saves, sign-in, tests</span></summary>
+<p>Stays: the PartyServer room, Convex world saves, Clerk sign-in, the 20-tick deterministic simulation and its replay tests, and the dev scripts. Goes: the voxel block world, the Gloomling tower, Sight, Ley logic and the high camera.</p>
+</details>
+
+<details>
+<summary>Risks <span>five, each with a response</span></summary>
+<ul>
+<li>Agents can't sculpt anime characters. Placeholders keep work moving until your VRoid hero arrives.</li>
+<li>Astra's taste may drift. The Look step stops for your approval, and I compare screenshots at every step.</li>
+<li>Friends far from the server will lag. Slow splashes and long attack glints hide up to about 250&nbsp;ms.</li>
+<li>Open world, story, farming and combat is a lot. Each step is playable, so we can stop or reorder anywhere.</li>
+<li>Frame rate on real laptops is unmeasured. You check it after the Look step.</li>
+</ul>
+</details>
+
+<details>
+<summary>Sources <span>11 games and talks the plan draws on</span></summary>
+<ul>
+<li><a href="https://www.gamedeveloper.com/design/dave-the-diver">Dave the Diver design interview</a>: why day and night are separate.</li>
+<li><a href="https://www.Gameinformer.com/review/sakuna-of-rice-and-ruin/sakuna-of-rice-and-ruin-review-feast-and-famine">Sakuna review</a> and <a href="https://primagames.com/reviews/sakuna-of-rice-and-ruin-review">Prima</a>: rice as stats, and why the stat link must be visible.</li>
+<li><a href="https://splatoonwiki.org/wiki/Salmon_Run">Salmon Run</a>: co-op PvE with paint and revives.</li>
+<li><a href="https://plantsvszombies.wiki.gg/wiki/Garden_Ops">Garden Ops</a>: planting defenses mid-fight.</li>
+<li><a href="https://library.keqingmains.com/combat-mechanics/frames">Genshin frame data</a>: dodge invulnerability length.</li>
+<li><a href="https://developer.valvesoftware.com/wiki/Lag_Compensation">Valve lag compensation</a> and <a href="https://gabrielgambetta.com/client-side-prediction-server-reconciliation.html">Gambetta</a>: netcode.</li>
+<li><a href="https://gmtk.substack.com/p/how-nintendo-solved-zeldas-open-world">GMTK on Breath of the Wild</a> and <a href="https://blog.playstation.com/2021/08/05/crafting-a-tiny-open-world-a-look-behind-the-scenes-at-the-creation-of-a-short-hike/">A Short Hike</a>: small open worlds.</li>
+<li><a href="https://butwhytho.net/2021/08/13/interview-developing-hades-with-supergiant-games-greg-kasavin/">Hades interview</a>: story after every run.</li>
+<li><a href="https://sourcegaming.info/2015/11/11/thoughts-on-hitstop-sakurais-famitsu-column-vol-490-1/">Sakurai on hit-stop</a>: combat feel.</li>
+<li><a href="https://poki.com/blog/what-makes-high-quality-browser-game">Poki</a>: load time and first download size for web games.</li>
+<li><a href="https://github.com/pixiv/three-vrm">three-vrm</a> and <a href="https://quaternius.com/packs/stylizednaturemegakit.html">Quaternius MegaKit</a>: characters and scenery.</li>
+</ul>
+</details>
+</main>
+<script>
+addEventListener("beforeprint", () => document.querySelectorAll("details").forEach((d) => { d.dataset.wasOpen = d.open; d.open = true; }));
+addEventListener("afterprint", () => document.querySelectorAll("details").forEach((d) => (d.open = d.dataset.wasOpen === "true")));
+</script>
+</body>
+</html>
